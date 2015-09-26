@@ -306,4 +306,4 @@ test('Sync of rejecting promises', function()
 	ok(eq(f2.called[1][1], {'foo', 'bar', 'baz'}), 'sync promise rejected with correct args')
 end)
 
-os.exit(tests_failed == 0)
+if tests_failed > 0 then os.exit(1) end

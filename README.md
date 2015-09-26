@@ -160,6 +160,7 @@ end)
 You may start multiple asynchronous actions in parallel and wait for all of
 them to complete:
 
+``` lua
 deferred.all(
 	http.get('http://example.com/first'),
 	http.get('http://example.com/second'),
@@ -171,6 +172,7 @@ end, function(results)
 	-- handle errors here (all requests are finished and there has been
 	-- at least one error)
 end)
+```
 
 ## Waiting for the first promise
 

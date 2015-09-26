@@ -146,8 +146,7 @@ function M.new(options)
 	return d
 end
 
-function M.sync(...)
-	local args = {...}
+function M.all(args)
 	local d = M.new()
 	if #args == 0 then
 		return d:resolve({})

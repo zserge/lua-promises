@@ -11,12 +11,10 @@ env:
 addons:
   apt:
     packages:
-      - $LUA
+      - lua5.1
+      - lua5.2
+      - luajit
 
 script:
   - $LUA deferred_test.lua
 
-notifications:
-  email:
-    on_success: change
-    on_failure: always

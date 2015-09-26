@@ -1,0 +1,9 @@
+language: c
+
+before_install:
+  - sudo apt-get install lua5.1 lua5.2 luajit -y
+
+script:
+  - lua5.1 deferred_test.lua
+  - lua5.2 deferred_test.lua
+  - luajit deferred_test.lua

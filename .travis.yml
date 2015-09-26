@@ -1,5 +1,7 @@
 language: c
 
+sudo: false
+
 before_install:
   - sudo apt-get install lua5.1 lua5.2 luajit -y
 

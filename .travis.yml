@@ -9,7 +9,7 @@ env:
     - LUA=luajit
 
 before_install:
-  - apt-get install $LUA -y
+  - sudo apt-get install $LUA -qq
 
 script:
   - $LUA deferred_test.lua

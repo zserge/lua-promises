@@ -6,7 +6,7 @@ env:
   matrix:
     - LUA=lua5.1
     - LUA=lua5.2
-    - LUA=luajit
+    - LUA=luajit-2.0.0-beta9
 
 addons:
   apt:

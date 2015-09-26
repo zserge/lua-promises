@@ -1,4 +1,4 @@
-language: c
+language: ruby
 
 sudo: false
 
@@ -9,7 +9,7 @@ env:
     - LUA=luajit
 
 before_install:
-  - sudo apt-get install $LUA -y
+  - apt-get install $LUA -y
 
 script:
   - $LUA deferred_test.lua

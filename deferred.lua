@@ -175,4 +175,35 @@ function M.all(args)
 	return d
 end
 
+function M.map(args, fn)
+	local d = M.new()
+	local results = {}
+	local function donext(i)
+		if i > #args then
+			d:resolve(results)
+		else
+			fn(args[i]):next(function(res)
+				table.insert(results, res)
+				donext(i+1)
+			end, function(err)
+				d:reject(err)
+			end)
+		end
+	end
+	donext(1)
+	return d
+end
+
+function M.first(args)
+	local d = M.new()
+	for _, v in ipairs(args) do
+		v:next(function(res)
+			d:resolve(res)
+		end, function(err)
+			d:reject(err)
+		end)
+	end
+	return d
+end
+
 return M

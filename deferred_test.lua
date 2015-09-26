@@ -306,4 +306,50 @@ test('Parallel promises rejection', function()
 	ok(eq(f2.called[1][1], {'foo', 'bar', 'baz'}), 'promise values are correct')
 end)
 
+test('Sequential mapping of promises', function()
+	local function len(s)
+		local d = deferred.new()
+		d:resolve(#s)
+		return d
+	end
+
+	local f = spy(function(res)
+		ok(#res == 3, 'all promises are resolved')
+		ok(res[1] == 3 and res[2] == 6 and res[3] == 5, 'promise values are correct')
+	end)
+
+	deferred.map({'foo', 'barbaz', 'hello'}, len):next(f)
+	ok(f.called, 'wrapper promise is called')
+end)
+
+test('Race of resolved promises', function()
+	local a = deferred.new()
+	local b = deferred.new();
+
+	local c = deferred.first({a, b})
+	local f = spy()
+
+	c:next(f)
+	a:resolve('foo')
+	b:resolve('bar')
+	ok(#f.called == 1, 'race promise was called once')
+	ok(f.called[1][1] == 'foo', 'promise was called with the first resolved value')
+end)
+
+test('Race of rejected promises', function()
+	local a = deferred.new()
+	local b = deferred.new();
+
+	local c = deferred.first({a, b})
+	local f = spy()
+	local g = spy()
+
+	c:next(f, g)
+	a:reject('foo')
+	b:resolve('bar')
+	ok(not f.called, 'race promise was not resolved once')
+	ok(#g.called == 1, 'race promise was rejected once')
+	ok(g.called[1][1] == 'foo', 'promise was rejected with the first error')
+end)
+
 if tests_failed > 0 then os.exit(1) end

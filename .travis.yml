@@ -8,8 +8,10 @@ env:
     - LUA=lua5.2
     - LUA=luajit
 
-before_install:
-  - sudo apt-get install $LUA -qq
+addons:
+  apt:
+    packages:
+      - $LUA
 
 script:
   - $LUA deferred_test.lua

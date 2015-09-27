@@ -60,6 +60,20 @@ rejected. Various callbacks could be added to the object to get notified when
 the object is resolved. Such objects are called promises, deferred objects,
 thennables - all these names describe pretty much the same behavior.
 
+## Install
+
+In terminal:
+
+``` bash
+luarocks install --server=http://luarocks.org/dev lua-promises
+```
+
+In Lua code:
+
+``` lua
+local deferred = require('deferred')
+```
+
 ## API
 
 Create new promises:

@@ -175,11 +175,11 @@ You may start multiple asynchronous actions in parallel and wait for all of
 them to complete:
 
 ``` lua
-deferred.all(
+deferred.all({
 	http.get('http://example.com/first'),
 	http.get('http://example.com/second'),
-	http.get('http://example.com/third')
-):next(function(results)
+	http.get('http://example.com/third'),
+}):next(function(results)
 	-- handle results here (all requests are finished and there has been
 	-- no errors)
 end, function(results)
@@ -203,10 +203,10 @@ function timeout(sec)
 	return d
 end
 
-deferred.first(
+deferred.first({
 	read(somefile), -- resolves promise with contents, or rejects with error
 	timeout(5),
-):next(function(result)
+}):next(function(result)
 	...file was read successfully...
 end, function(err)
 	...either timeout or I/O error...

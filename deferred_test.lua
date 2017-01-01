@@ -352,4 +352,21 @@ test('Race of rejected promises', function()
 	ok(g.called[1][1] == 'foo', 'promise was rejected with the first error')
 end)
 
+test('Passing a function into new(): resolve', function()
+	local f = spy(function(d) d:resolve(42) end)
+	local g = spy()
+	deferred.new(f):next(g)
+	ok(#f.called == 1, 'first callback in chain called once')
+	ok(g.called[1][1] == 42, 'second callback received deferred value')
+end)
+
+test('Passing a function into new(): reject', function()
+	local f = function(d) error('panic', 0) end
+	local g = spy()
+	local e = spy()
+	deferred.new(f):next(g, e)
+	ok(not g.called, 'resolve handler was not called')
+	ok(e.called[1][1] == 'panic', 'error handler was called')
+end)
+
 if tests_failed > 0 then os.exit(1) end

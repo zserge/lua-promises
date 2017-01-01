@@ -120,6 +120,14 @@ function deferred:reject(value)
 end
 
 function M.new(options)
+	if isfunction(options) then
+		local d = M.new()
+		local ok, err = pcall(options, d)
+		if not ok then
+			d:reject(err)
+		end
+		return d
+	end
 	options = options or {}
 	local d
 	d = {

@@ -1,0 +1,385 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<head>
+    <title>Reference</title>
+    <link rel="stylesheet" href="ldoc.css" type="text/css" />
+</head>
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"></div>
+	<div id="product_name"><big><b></b></big></div>
+	<div id="product_description"></div>
+</div> <!-- id="product" -->
+
+
+<div id="main">
+
+
+<!-- Menu -->
+
+<div id="navigation">
+<br/>
+<h1>ldoc</h1>
+
+
+<h2>Contents</h2>
+<ul>
+<li><a href="#Functions">Functions</a></li>
+<li><a href="#Class_Promise">Class Promise </a></li>
+</ul>
+
+
+<h2>Modules</h2>
+<ul class="nowrap">
+  <li><strong>deferred</strong></li>
+</ul>
+
+</div>
+
+<div id="content">
+
+<h1>Module <code>deferred</code></h1>
+<p>A+ promises in Lua.</p>
+<p></p>
+
+
+<h2><a href="#Functions">Functions</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#new">new (options)</a></td>
+	<td class="summary">Returns a new promise object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#all">all (args)</a></td>
+	<td class="summary">Returns a new promise object that is resolved when all promises are resolved/rejected.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#map">map (args, fn)</a></td>
+	<td class="summary">Returns a new promise object that is resolved with the values of sequential application of function fn to each element in the list.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#first">first (args)</a></td>
+	<td class="summary">Returns a new promise object that is resolved as soon as the first of the promises gets resolved/rejected.</td>
+	</tr>
+</table>
+<h2><a href="#Class_Promise">Class Promise </a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" nowrap><a href="#Promise:next">Promise:next (cb[, errcb])</a></td>
+	<td class="summary">Wait for the promise object.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Promise:resolve">Promise:resolve (value)</a></td>
+	<td class="summary">Resolve promise object with value.</td>
+	</tr>
+	<tr>
+	<td class="name" nowrap><a href="#Promise:reject">Promise:reject (value)</a></td>
+	<td class="summary">Reject promise object with value.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
+
+
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "new"></a>
+    <strong>new (options)</strong>
+    </dt>
+    <dd>
+    Returns a new promise object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">options</span>
+
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="index.html#Promise">Promise</a></span>
+        New promise
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> deferred = <span class="global">require</span>(<span class="string">'deferred'</span>)
+
+<span class="comment">--
+</span><span class="comment">-- Converting callback-based API into promise-based is very straightforward:
+</span><span class="comment">--
+</span><span class="comment">-- 1) Create promise object
+</span><span class="comment">-- 2) Start your asynchronous action
+</span><span class="comment">-- 3) Resolve promise object whenever action is finished (only first resolution
+</span><span class="comment">--    is accepted, others are ignored)
+</span><span class="comment">-- 4) Reject promise object whenever action is failed (only first rejection is
+</span><span class="comment">--    accepted, others are ignored)
+</span><span class="comment">-- 5) Return promise object letting calling side to add a chain of callbacks to
+</span><span class="comment">--    your asynchronous function
+</span>
+<span class="keyword">function</span> read(f)
+  <span class="keyword">local</span> d = deferred.new()
+  readasync(f, <span class="keyword">function</span>(contents, err)
+      <span class="keyword">if</span> err == <span class="keyword">nil</span> <span class="keyword">then</span>
+        d:resolve(contents)
+      <span class="keyword">else</span>
+        d:reject(err)
+      <span class="keyword">end</span>
+  <span class="keyword">end</span>)
+  <span class="keyword">return</span> d
+<span class="keyword">end</span>
+
+<span class="comment">-- You can now use read() like this:
+</span>read(<span class="string">'file.txt'</span>):<span class="global">next</span>(<span class="keyword">function</span>(s)
+    <span class="global">print</span>(<span class="string">'File.txt contents: '</span>, s)
+  <span class="keyword">end</span>, <span class="keyword">function</span>(err)
+    <span class="global">print</span>(<span class="string">'Error'</span>, err)
+<span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "all"></a>
+    <strong>all (args)</strong>
+    </dt>
+    <dd>
+    Returns a new promise object that is resolved when all promises are resolved/rejected.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">args</span>
+         list of promise
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="index.html#Promise">Promise</a></span>
+        New promise
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">deferred.all({
+    http.get(<span class="string">'http://example.com/first'</span>),
+    http.get(<span class="string">'http://example.com/second'</span>),
+    http.get(<span class="string">'http://example.com/third'</span>),
+  }):<span class="global">next</span>(<span class="keyword">function</span>(results)
+      <span class="comment">-- handle results here (all requests are finished and there has been
+</span>      <span class="comment">-- no errors)
+</span>    <span class="keyword">end</span>, <span class="keyword">function</span>(results)
+      <span class="comment">-- handle errors here (all requests are finished and there has been
+</span>      <span class="comment">-- at least one error)
+</span>  <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "map"></a>
+    <strong>map (args, fn)</strong>
+    </dt>
+    <dd>
+    Returns a new promise object that is resolved with the values of sequential application of function fn to each element in the list.  fn is expected to return promise object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">args</span>
+         list of promise
+        </li>
+        <li><span class="parameter">fn</span>
+         promise used to resolve the list of promise
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        a new promise
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="keyword">local</span> items = {<span class="string">'a.txt'</span>, <span class="string">'b.txt'</span>, <span class="string">'c.txt'</span>}
+<span class="comment">-- Read 3 files, one by one
+</span>deferred.map(items, read):<span class="global">next</span>(<span class="keyword">function</span>(files)
+    <span class="comment">-- here files is an array of file contents for each of the files
+</span>  <span class="keyword">end</span>, <span class="keyword">function</span>(err)
+    <span class="comment">-- handle reading error
+</span><span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "first"></a>
+    <strong>first (args)</strong>
+    </dt>
+    <dd>
+    Returns a new promise object that is resolved as soon as the first of the promises gets resolved/rejected.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">args</span>
+         list of promise
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="index.html#Promise">Promise</a></span>
+        New promise
+    </ol>
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- returns a promise that gets rejected after a certain timeout
+</span><span class="keyword">function</span> timeout(sec)
+  <span class="keyword">local</span> d = deferred.new()
+  settimeout(<span class="keyword">function</span>()
+      d:reject(<span class="string">'Timeout'</span>)
+    <span class="keyword">end</span>, sec)
+  <span class="keyword">return</span> d
+<span class="keyword">end</span>
+
+deferred.first({
+    read(somefile), <span class="comment">-- resolves promise with contents, or rejects with error
+</span>    timeout(<span class="number">5</span>),
+  }):<span class="global">next</span>(<span class="keyword">function</span>(result)
+      <span class="comment">-- file was read successfully...
+</span>    <span class="keyword">end</span>, <span class="keyword">function</span>(err)
+      <span class="comment">-- either timeout or I/O error...
+</span>  <span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+</dl>
+    <h2 class="section-header has-description"><a name="Class_Promise"></a>Class Promise </h2>
+
+          <div class="section-description">
+          A promise is an object that can store a value to be retrieved by a future object.
+          </div>
+    <dl class="function">
+    <dt>
+    <a name = "Promise:next"></a>
+    <strong>Promise:next (cb[, errcb])</strong>
+    </dt>
+    <dd>
+    Wait for the promise object.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">cb</span>
+            <span class="types"><span class="type">function</span></span>
+         resolve callback (function(value) end)
+        </li>
+        <li><span class="parameter">errcb</span>
+            <span class="types"><span class="type">function</span></span>
+         rejection callback (function(reject_value) end)
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example"><span class="comment">-- Reading two files sequentially:
+</span>read(<span class="string">'first.txt'</span>):<span class="global">next</span>(<span class="keyword">function</span>(s)
+	<span class="global">print</span>(<span class="string">'File file:'</span>, s)
+	<span class="keyword">return</span> read(<span class="string">'second.txt'</span>)
+<span class="keyword">end</span>):<span class="global">next</span>(<span class="keyword">function</span>(s)
+	<span class="global">print</span>(<span class="string">'Second file:'</span>, s)
+<span class="keyword">end</span>):<span class="global">next</span>(<span class="keyword">nil</span>, <span class="keyword">function</span>(err)
+	<span class="comment">-- error while reading first or second file
+</span>	<span class="global">print</span>(<span class="string">'Error'</span>, err)
+<span class="keyword">end</span>)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Promise:resolve"></a>
+    <strong>Promise:resolve (value)</strong>
+    </dt>
+    <dd>
+    Resolve promise object with value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+         promise value
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        resolved future result
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Promise:reject"></a>
+    <strong>Promise:reject (value)</strong>
+    </dt>
+    <dd>
+    Reject promise object with value.
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+         promise value
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+        rejected future result
+    </ol>
+
+
+
+
+</dd>
+</dl>
+
+
+</div> <!-- id="content" -->
+</div> <!-- id="main" -->
+<div id="about">
+<i>generated by <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a></i>
+<i style="float:right;">Last updated 2018-02-20 14:54:01 </i>
+</div> <!-- id="about" -->
+</div> <!-- id="container" -->
+</body>
+</html>
